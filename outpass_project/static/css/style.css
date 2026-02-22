@@ -1,0 +1,589 @@
+/* ==================================================
+   OUTPASS MANAGEMENT SYSTEM - GLOBAL STYLES
+   ================================================== */
+
+:root {
+  --primary: #1e3a5f;
+  --primary-light: #2c5282;
+  --accent: #3182ce;
+  --success: #38a169;
+  --warning: #d69e2e;
+  --danger: #e53e3e;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --gray-900: #111827;
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 50%, #1a365d 100%);
+  min-height: 100vh;
+  color: var(--gray-800);
+  line-height: 1.6;
+}
+
+/* --- Login Pages --- */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.login-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-card h1 {
+  color: var(--primary);
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.login-card .subtitle {
+  color: var(--gray-600);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1.25rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius);
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.btn-primary:hover {
+  background: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-links {
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.login-links a {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.login-links a:hover {
+  text-decoration: underline;
+}
+
+.error-msg {
+  background: #fed7d7;
+  color: var(--danger);
+  padding: 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+.error-msg.show {
+  display: block;
+}
+
+/* --- Dashboard Layout --- */
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 260px;
+  background: var(--gray-900);
+  color: white;
+  padding: 1.5rem 0;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 1rem;
+}
+
+.sidebar-brand h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.sidebar-brand .role {
+  font-size: 0.8rem;
+  color: var(--gray-300);
+  margin-top: 0.25rem;
+}
+
+.sidebar-nav a {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  color: var(--gray-300);
+  text-decoration: none;
+  transition: color 0.2s, background 0.2s;
+}
+
+.sidebar-nav a:hover,
+.sidebar-nav a.active {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-nav .logout {
+  color: #fca5a5;
+  margin-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1rem;
+}
+
+.sidebar-nav .logout:hover {
+  background: rgba(239, 68, 68, 0.2);
+  color: #fecaca;
+}
+
+.main-content {
+  flex: 1;
+  padding: 2rem;
+  background: var(--gray-50);
+  overflow-y: auto;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  color: var(--gray-900);
+}
+
+.page-header p {
+  color: var(--gray-600);
+  margin-top: 0.25rem;
+}
+
+/* --- Cards --- */
+.card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin-bottom: 1rem;
+}
+
+/* --- Request Cards --- */
+.request-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.request-card {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  border-left: 4px solid var(--gray-300);
+}
+
+.request-card.pending {
+  border-left-color: var(--warning);
+}
+
+.request-card.approved {
+  border-left-color: var(--success);
+}
+
+.request-card.rejected {
+  border-left-color: var(--danger);
+}
+
+.request-card h3 {
+  font-size: 1rem;
+  color: var(--gray-800);
+  margin-bottom: 0.5rem;
+}
+
+.request-card .meta {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  margin-bottom: 0.75rem;
+}
+
+.request-card .reason {
+  font-size: 0.9rem;
+  color: var(--gray-700);
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--gray-50);
+  border-radius: var(--radius);
+}
+
+.request-card .actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+/* --- Badges --- */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.badge-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-approved {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-rejected {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-not-required {
+  background: var(--gray-200);
+  color: var(--gray-700);
+}
+
+.badge-ready {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+/* Attendance status badges */
+.badge-present {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-absent {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-not-marked {
+  background: var(--gray-200);
+  color: var(--gray-600);
+}
+
+.badge-od {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Verification badges: SELF (AUTO), MODIFIED (TUTOR), VERIFIED (WARDEN) */
+.badge-self {
+  background: #2563eb;
+  color: white;
+  font-size: 0.7rem;
+}
+
+.badge-modified {
+  background: #ea580c;
+  color: white;
+  font-size: 0.7rem;
+}
+
+.badge-verified {
+  background: #7c3aed;
+  color: white;
+  font-size: 0.7rem;
+}
+
+/* Margin between status badge and verification badge */
+.session-cell .status-row .badge + .badge {
+  margin-left: 0.35rem;
+}
+
+.session-cell .status-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+/* --- Buttons --- */
+.btn-sm {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+
+.btn-success:hover {
+  background: #2f855a;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #c53030;
+}
+
+.btn-secondary {
+  background: var(--gray-200);
+  color: var(--gray-700);
+}
+
+.btn-secondary:hover {
+  background: var(--gray-300);
+}
+
+/* --- Attendance Section --- */
+.attendance-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 500px;
+}
+
+.attendance-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.attendance-table th {
+  background: var(--gray-50);
+  font-weight: 600;
+  color: var(--gray-700);
+  font-size: 0.85rem;
+}
+
+.attendance-table tr:hover {
+  background: var(--gray-50);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--gray-600);
+}
+
+.empty-state p {
+  margin-top: 0.5rem;
+}
+
+/* --- Loading --- */
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: var(--gray-600);
+}
+
+/* --- Summary panel (attendance) --- */
+.summary-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.summary-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.summary-card .value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--gray-900);
+}
+
+.summary-card .label {
+  font-size: 0.8rem;
+  color: var(--gray-600);
+  margin-top: 0.25rem;
+}
+
+.summary-card.total .value { color: var(--primary); }
+.summary-card.present .value { color: var(--success); }
+.summary-card.absent .value { color: var(--danger); }
+
+/* --- Attendance table (responsive) --- */
+.attendance-section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--gray-800);
+  margin: 1.5rem 0 0.75rem 0;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  background: white;
+}
+
+.attendance-table .status-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.attendance-table .action-btns {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.attendance-table .btn-tiny {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.75rem;
+}
+
+/* Session cell: status on top, buttons below with spacing */
+.session-cell {
+  vertical-align: top;
+  min-width: 160px;
+}
+
+.session-cell .status-row {
+  margin-bottom: 0.5rem;
+}
+
+.session-cell .action-btns {
+  margin-top: 0.5rem;
+}
+
+/* Attendance action buttons: Present=blue, Absent=red, OD=amber */
+.btn-present {
+  background: #2563eb;
+  color: white;
+  border: none;
+}
+
+.btn-present:hover {
+  background: #1d4ed8;
+}
+
+.btn-absent {
+  background: #dc2626;
+  color: white;
+  border: none;
+}
+
+.btn-absent:hover {
+  background: #b91c1c;
+}
+
+.btn-od {
+  background: #d97706;
+  color: white;
+  border: none;
+}
+
+.btn-od:hover {
+  background: #b45309;
+}

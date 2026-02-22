@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Warden Dashboard - Outpass Management System</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <div class="dashboard">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h2>Outpass System</h2>
+        <span class="role" id="wardenName">Warden</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="active" data-section="requests">Outpass Requests</a>
+        <a href="#" data-section="attendance">Hostel Attendance</a>
+        <a href="/warden_login.html" class="logout">Logout</a>
+      </nav>
+    </aside>
+    <main class="main-content">
+      <div id="requestsSection">
+        <div class="page-header">
+          <h1>Outpass Requests</h1>
+          <p>Approve or reject outpass requests from hostellers (tutor-approved)</p>
+        </div>
+        <div id="requestsList" class="request-grid"></div>
+        <div id="requestsEmpty" class="empty-state" style="display:none">
+          <p>No pending requests</p>
+        </div>
+      </div>
+      <div id="attendanceSection" style="display:none">
+        <div class="page-header">
+          <h1>Hostel Attendance</h1>
+          <p>Morning &amp; evening attendance for hostellers (your gender only)</p>
+        </div>
+        <div class="card">
+          <div class="form-group" style="max-width:200px">
+            <label for="attDate">Date</label>
+            <input type="date" id="attDate">
+          </div>
+          <button type="button" class="btn btn-primary btn-sm" id="loadAttendanceBtn">Load Attendance</button>
+          <p style="font-size:0.85rem;color:var(--gray-600);margin-top:0.75rem">Allow browser location when marking attendance.</p>
+        </div>
+        <div class="card">
+          <div class="card-title">Morning &amp; Evening Attendance</div>
+          <div class="table-wrap">
+            <table class="attendance-table" id="attendanceTable">
+              <thead>
+                <tr>
+                  <th>Student Name</th>
+                  <th>Morning</th>
+                  <th>Evening</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceBody"></tbody>
+            </table>
+          </div>
+          <div id="recordsEmpty" class="empty-state" style="display:none">Select date and click Load Attendance</div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script>
+    const warden = JSON.parse(sessionStorage.getItem('warden'));
+    if (!warden) {
+      window.location.href = '/warden_login.html';
+    }
+    document.getElementById('wardenName').textContent = warden.name + ' (' + warden.gender + ')';
+
+    const username = warden.username;
+    const API = '/api/warden';
+
+    // Section switching
+    document.querySelectorAll('.sidebar-nav a[data-section]').forEach(a => {
+      a.addEventListener('click', (e) => {
+        if (a.classList.contains('logout')) return;
+        e.preventDefault();
+        document.querySelectorAll('.sidebar-nav a').forEach(x => x.classList.remove('active'));
+        a.classList.add('active');
+        document.getElementById('requestsSection').style.display = a.dataset.section === 'requests' ? 'block' : 'none';
+        document.getElementById('attendanceSection').style.display = a.dataset.section === 'attendance' ? 'block' : 'none';
+        if (a.dataset.section === 'attendance') {
+          const today = new Date().toISOString().split('T')[0];
+          document.getElementById('attDate').value = today;
+          document.getElementById('loadAttendanceBtn').click();
+        }
+      });
+    });
+
+    // Load requests
+    async function loadRequests() {
+      const list = document.getElementById('requestsList');
+      const empty = document.getElementById('requestsEmpty');
+      list.innerHTML = '<div class="loading">Loading...</div>';
+      empty.style.display = 'none';
+      try {
+        const res = await fetch(`${API}/requests?username=${encodeURIComponent(username)}`);
+        const data = await res.json();
+        list.innerHTML = '';
+        const requests = data.requests || [];
+        if (requests.length === 0) {
+          empty.style.display = 'block';
+          empty.querySelector('p').textContent = 'No pending requests (tutor-approved hosteller requests)';
+        } else {
+          requests.forEach(r => {
+            const card = document.createElement('div');
+            card.className = 'request-card pending';
+            card.innerHTML = `
+              <h3>${r.student_name} <span class="badge badge-approved">Tutor Approved</span> <span class="badge badge-pending">${r.warden_status}</span></h3>
+              <div class="meta">${r.category} | #${r.request_id}</div>
+              <div class="reason">${r.reason}</div>
+              <div class="actions">
+                <button class="btn btn-success btn-sm" data-id="${r.request_id}">Approve</button>
+                <button class="btn btn-danger btn-sm" data-id="${r.request_id}">Reject</button>
+              </div>
+            `;
+            card.querySelector('.btn-success').addEventListener('click', () => approveRequest(r.request_id));
+            card.querySelector('.btn-danger').addEventListener('click', () => rejectRequest(r.request_id));
+            list.appendChild(card);
+          });
+        }
+      } catch (e) {
+        list.innerHTML = '<div class="error-msg show">Failed to load requests</div>';
+      }
+    }
+
+    async function approveRequest(id) {
+      try {
+        const res = await fetch(`${API}/approve?username=${encodeURIComponent(username)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ request_id: id })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) alert('Request approved. Student ready for exit.');
+        else alert(data.detail || 'Failed');
+        loadRequests();
+      } catch (e) { alert('Error'); }
+    }
+
+    async function rejectRequest(id) {
+      if (!confirm('Reject this request?')) return;
+      try {
+        const res = await fetch(`${API}/reject?username=${encodeURIComponent(username)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ request_id: id })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) alert('Request rejected.');
+        else alert(data.detail || 'Failed');
+        loadRequests();
+      } catch (e) { alert('Error'); }
+    }
+
+    function statusBadgeClass(status) {
+      if (status === 'PRESENT') return 'badge-present';
+      if (status === 'ABSENT') return 'badge-absent';
+      if (status === 'OD') return 'badge-od';
+      return 'badge-not-marked';
+    }
+    function verifiedBadge(verifiedBy) {
+      if (!verifiedBy) return '';
+      if (verifiedBy === 'AUTO') return '<span class="badge badge-self">SELF</span>';
+      if (verifiedBy === 'TUTOR') return '<span class="badge badge-modified">MODIFIED</span>';
+      if (verifiedBy === 'WARDEN') return '<span class="badge badge-verified">VERIFIED</span>';
+      return '<span class="badge badge-modified">MODIFIED</span>';
+    }
+
+    async function getLocation() {
+      return new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(
+          p => resolve({ lat: p.coords.latitude, lon: p.coords.longitude }),
+          reject,
+          { enableHighAccuracy: true }
+        );
+      });
+    }
+
+    async function markWardenAttendance(studentId, date, session, status) {
+      try {
+        console.log(`[Warden Attendance] Starting - studentId: ${studentId}, date: ${date}, session: ${session}, status: ${status}`);
+        const { lat, lon } = await getLocation();
+        console.log(`[Warden Attendance] Location captured - lat: ${lat}, lon: ${lon}`);
+        const body = { student_id: studentId, date, session, status, latitude: lat, longitude: lon };
+        console.log(`[Warden Attendance] Request body:`, body);
+        const res = await fetch(`${API}/mark-attendance?username=${encodeURIComponent(username)}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body)
+        });
+        const data = await res.json();
+        console.log(`[Warden Attendance] Response:`, data);
+        if (res.ok && data && data.success !== false) return data;
+        if (data && data.message) {
+          alert(data.message);
+          return null;
+        }
+        throw new Error((data && data.detail) || 'Failed');
+      } catch (e) {
+        console.error(`[Warden Attendance] Error:`, e);
+        if (e.message && e.message.includes('Location')) alert('Allow location access to mark attendance.');
+        else alert(e.message || 'Error');
+        return null;
+      }
+    }
+
+    document.getElementById('loadAttendanceBtn').addEventListener('click', async () => {
+      const date = document.getElementById('attDate').value;
+      if (!date) { alert('Select date'); return; }
+      const tbody = document.getElementById('attendanceBody');
+      const empty = document.getElementById('recordsEmpty');
+      tbody.innerHTML = '<tr><td colspan="3" class="loading">Loading...</td></tr>';
+      empty.style.display = 'none';
+      try {
+        const res = await fetch(`${API}/hostel-attendance?username=${encodeURIComponent(username)}&date=${date}`);
+        const data = await res.json();
+        const students = data.students || [];
+        tbody.innerHTML = '';
+        if (students.length === 0) {
+          empty.style.display = 'block';
+          empty.textContent = 'No hostellers in your section';
+        } else {
+          students.forEach(s => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${s.name}</td>
+              <td class="session-cell">
+                <div class="status-row status-cell">
+                  <span class="badge ${statusBadgeClass(s.morning_status)}">${s.morning_status}</span>
+                  ${verifiedBadge(s.morning_verified_by || s.verified_by_morning)}
+                </div>
+                <div class="action-btns">
+                  <button type="button" class="btn btn-present btn-tiny" data-session="MORNING" data-status="PRESENT" data-id="${s.student_id}">Mark Present</button>
+                  <button type="button" class="btn btn-absent btn-tiny" data-session="MORNING" data-status="ABSENT" data-id="${s.student_id}">Mark Absent</button>
+                </div>
+              </td>
+              <td class="session-cell">
+                <div class="status-row status-cell">
+                  <span class="badge ${statusBadgeClass(s.evening_status)}">${s.evening_status}</span>
+                  ${verifiedBadge(s.evening_verified_by || s.verified_by_evening)}
+                </div>
+                <div class="action-btns">
+                  <button type="button" class="btn btn-present btn-tiny" data-session="EVENING" data-status="PRESENT" data-id="${s.student_id}">Mark Present</button>
+                  <button type="button" class="btn btn-absent btn-tiny" data-session="EVENING" data-status="ABSENT" data-id="${s.student_id}">Mark Absent</button>
+                </div>
+              </td>
+            `;
+            tr.querySelectorAll('[data-session="MORNING"]').forEach(btn => {
+              btn.addEventListener('click', async () => {
+                if (await markWardenAttendance(s.student_id, date, 'MORNING', btn.dataset.status)) document.getElementById('loadAttendanceBtn').click();
+              });
+            });
+            tr.querySelectorAll('[data-session="EVENING"]').forEach(btn => {
+              btn.addEventListener('click', async () => {
+                if (await markWardenAttendance(s.student_id, date, 'EVENING', btn.dataset.status)) document.getElementById('loadAttendanceBtn').click();
+              });
+            });
+            tbody.appendChild(tr);
+          });
+        }
+      } catch (e) {
+        empty.style.display = 'block';
+        empty.textContent = 'Failed to load';
+      }
+    });
+
+    loadRequests();
+  </script>
+</body>
+</html>
